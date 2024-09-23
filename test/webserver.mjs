@@ -318,7 +318,7 @@ class WebServer {
                   color: fuchsia;
                 }
                   
-                .a_folder.active {
+                .a_folder.active { 
                   color: #5c00ff !important;
                 }
                 .a_folder(:focus,:active)  {
