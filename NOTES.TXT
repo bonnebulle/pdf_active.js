@@ -1,0 +1,7 @@
+SOURCE :
+https://github.com/mozilla/pdf.js
+OK !
+RUN :
+npx gulp server
+GO : 
+http://localhost:8888/test/pdfs/?frame
