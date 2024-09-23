@@ -3,6 +3,7 @@
 Liste des fichiers (reorder files+folders)   
 Liste par date de modification (modified date)    
 Suivi du dernier consulté (localstorage follow last opened)   
+Lien de retour vers le pdf (backlink to pdf parent folder) 
 
 # Roadmap (fork)
 History for annotations   

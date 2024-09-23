@@ -213,7 +213,7 @@ class WebServer {
         </script>
           <frameset cols=*,200>
             <frame name=pdf> 
-            <frame src="${url.pathname}?side">
+            <frame name="liste" src="${url.pathname}?side">
           </frameset>
         </html>`,
         "utf8"
@@ -327,10 +327,19 @@ class WebServer {
             #filename {
               position: fixed;
               bottom: 0;
+              background: #FFF;
+              padding: 6px;
+            }
+            #filename a {
               font-size: 10px;
               font-family: sans-serif;
-              padding-left: 6px;
-              padding-bottom: 6px;
+
+              word-wrap: anywhere;
+              color: #154bb1;
+              text-decoration: none;
+
+                float: right;
+                width: calc(100% - 16px);
             }
            </style>
          </head>
@@ -354,6 +363,9 @@ class WebServer {
                   // alert(currentURL +" - VS - "+ pastURL)
                   localStorage.setItem("pastURL", currentURL); // Mettre à jour l'URL précédente 
              }
+
+
+             
               
               document.addEventListener("DOMContentLoaded", function() {
                                   
@@ -362,7 +374,10 @@ class WebServer {
                   // alert(decodedURL)
 
                   var fileName = decodedURL.substring(decodedURL.lastIndexOf('/') + 1);
-                  document.getElementById('filename').textContent = fileName;
+                  var currentname_parent = decodedURL.substring(0, decodedURL.lastIndexOf('/')).replace("/web/viewer.html?file=",""); // Chemin vers le fichier
+                  var patent_currentfile="<div><span>< </span><a href='"+currentname_parent+"' target='liste'>"+fileName+"</a></div>"
+                  document.getElementById('filename').innerHTML = patent_currentfile; // Remplacer le contenu
+                  // alert(currentname_parent)
 
 
                   document.querySelectorAll('.a_file').forEach(fileLink => {
@@ -385,7 +400,8 @@ class WebServer {
                           var currentname = localStorage.getItem("localstorage_lastfile");
                           var decodedURL = decodeURIComponent(currentname);
                           var fileName = decodedURL.substring(decodedURL.lastIndexOf('/') + 1);
-                          document.getElementById('filename').textContent = fileName;
+                          var currentname_parent = decodedURL.substring(0, decodedURL.lastIndexOf('/')).replace("/web/viewer.html?file=",""); // Chemin vers le fichier
+                          var patent_currentfile="<div><span>< </span><a href='"+currentname_parent+"' target='liste'>"+fileName+"</a></div>"
 
                       });
 
