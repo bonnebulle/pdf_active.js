@@ -267,19 +267,31 @@ class WebServer {
 
                   var fileName = decodedURL.substring(decodedURL.lastIndexOf('/') + 1);
                   var currentname_parent = decodedURL.substring(0, decodedURL.lastIndexOf('/')).replace("/web/viewer.html?file=",""); // Chemin vers le fichier
-                  var patent_currentfile="<div><span>< </span><a href='"+currentname_parent+"' target='liste'>"+fileName+"</a></div>"
+                  var patent_currentfile="<div><span>< </span><a id='backlink' data-url='"+currentname+"' href='"+currentname_parent+"' target='liste'>"+fileName+"</a></div>"
                   document.getElementById('filename').innerHTML = patent_currentfile; // Remplacer le contenu
-                  // alert(currentname_parent)
 
 
                   document.querySelectorAll('.a_file').forEach(fileLink => {
                       fileLink.addEventListener('click', function(event) {
                           
                           if (this.href != undefined) {
+                            event.preventDefault();
+
                             localStorage.setItem("localstorage_lastfile", this.href); // Sauvegarder l'URL du fichier
-                          // } else {
-                            // localStorage.setItem("localstorage_lastfile", ""); // REMOVE
+
+                            var currentname = this.href;
+                            var decodedURL = decodeURIComponent(this.href);
+                            var fileName = decodedURL.substring(decodedURL.lastIndexOf('/') + 1);
+                            
+                            var currentname_parent = decodedURL.substring(0, decodedURL.lastIndexOf('/')).replace("/web/viewer.html?file=",""); // Chemin vers le fichier
+                            var patent_currentfile="<div><span>< </span><a id='backlink' data-url='"+currentname+"' href='"+currentname_parent+"' target='liste'>"+fileName+"</a></div>"
+                            document.getElementById('filename').innerHTML = patent_currentfile; // Remplacer le contenu
+
+                            const pdfFrame = window.parent.frames['pdf']; // Accès par nom
+                            pdfFrame.location.href = currentname;
+
                           }
+
                           let thisis= this;
                           this.classList.add("active");
                           document.querySelectorAll('.a_file').forEach(relinks => {
@@ -288,12 +300,6 @@ class WebServer {
                             }
                           });
 
-
-                          var currentname = localStorage.getItem("localstorage_lastfile");
-                          var decodedURL = decodeURIComponent(currentname);
-                          var fileName = decodedURL.substring(decodedURL.lastIndexOf('/') + 1);
-                          var currentname_parent = decodedURL.substring(0, decodedURL.lastIndexOf('/')).replace("/web/viewer.html?file=",""); // Chemin vers le fichier
-                          var patent_currentfile="<div><span>< </span><a href='"+currentname_parent+"' target='liste'>"+fileName+"</a></div>"
 
                       });
 
@@ -338,6 +344,15 @@ class WebServer {
                     // alert(currentname_fldr)
 
                 });
+
+
+
+                // document.querySelectorAll('#backlink').forEach(backlink => {
+                //   backlink.addEventListener('click', function(event) {
+                //     event.preventDefault();
+                //     alert("clic")
+                //   });
+                // });
               });
            </script>
          <body>` // Début de la liste ordonnée
@@ -367,7 +382,7 @@ class WebServer {
           }
           else if (index === segments.length - 1) {
             // const previousSegment = segments[index - 1] ? escapeHTML(segments[index - 1]) : '';
-            response.write(`<div class="lastlast"><strong><a style="" href=".."><span id="last">>> </span>${escapeHTML(segment)}</a></strong></div>`); // Lien cliquable en gras
+            response.write(`<div class="lastlast"><strong><a style="" href=".."><span id="last">> </span>${escapeHTML(segment)}</a></strong></div>`); // Lien cliquable en gras
             // response.write(`<div><strong><a style="" href="${escapeHTML(currentPath)}"><span id="last">>> </span>${escapeHTML(segment)}</a></strong></div>`); // Lien cliquable en gras
           } else {
             response.write(`<div><a class="notlast" href="${escapeHTML(currentPath)}"><span>> </span>${escapeHTML(segment)}</a></div>`); // Lien cliquable
