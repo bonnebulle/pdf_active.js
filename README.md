@@ -1,8 +1,11 @@
 # FORK
 ![preview.png](preview.png)
 Liste des fichiers (reorder files+folders)   
-suivi du dernier consulté (localstorage)   
-listing par date de modification (modified date)    
+Liste par date de modification (modified date)    
+Suivi du dernier consulté (localstorage follow last opened)   
+
+# Roadmap (fork)
+History for annotations   
 
 # PDF.js [![Build Status](https://github.com/mozilla/pdf.js/workflows/CI/badge.svg?branch=master)](https://github.com/mozilla/pdf.js/actions?query=workflow%3ACI+branch%3Amaster)
 
