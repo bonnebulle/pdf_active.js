@@ -1,0 +1,111 @@
+
+body {
+  margin: 10px 0;
+}
+  h1, ol {
+  padding-left: 13px !important;
+}
+ li, h1 {
+    padding-right: 6px;
+  }
+  ol {
+    margin-top: 10px;
+    border-top: 1px solid;
+    padding-top: 5px !important;
+
+  }
+  html h1 {
+    font-family: sans-serif;
+  }
+a {  word-wrap: anywhere;  }
+h1 a,
+.folder a {color: #000}
+.file a {
+  font-size: 14px;
+  line-height: 18px;
+  margin-top: 10px;
+  display: block;
+  margin-bottom: 17px !important;
+    text-decoration: none;
+}
+.folder {
+  font-size: 13px;
+  font-family: sans-serif;
+  font-weight: bold;
+  line-height: 1.2em;
+    margin-bottom: 12px;
+    margin-top: 12px;
+
+}
+.folder a {
+   text-decoration: navajowhite;
+}
+   #return {
+  margin-bottom: -13px;
+  display: block;
+}
+  #return, h1 a {
+    text-decoration: none;
+  }
+
+  hr + #footer {
+    font-size: 12px;
+  }
+
+  #footer p {
+    margin: 0;
+    padding-right: 5px;
+    text-align: right;
+    font-family: sans-serif;
+  }
+    #footer a {
+      color: #000;
+    }
+a span {
+  position: absolute;
+  margin-left: -20px;
+}
+h1 a {
+  padding-left: 16px;
+}
+  h1 a.notlast {
+    padding-left: 5px;
+      opacity: 0.6;
+  }
+  h1 a.notlast span {
+  position: absolute;
+  margin-left: -10px;
+}
+  ol a:visited {
+    color: #107102;
+  }
+    ol .folder a:visited {
+    color: #000;
+  }
+    ol .a_file.active {
+      color: fuchsia;
+    }
+      
+    .a_folder.active { 
+      color: #5c00ff !important;
+    }
+    .a_folder(:focus,:active)  {
+      color: blue !important;
+    }
+#filename {
+  position: fixed;
+  bottom: 0;
+  background: #FFF;
+  padding: 6px;
+}
+#filename a {
+  font-size: 10px;
+  font-family: sans-serif;
+
+  word-wrap: anywhere;
+  color: #154bb1;
+  text-decoration: none;
+
+    float: right;
+    width: calc(100% - 16px);
+}
