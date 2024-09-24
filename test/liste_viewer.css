@@ -3,7 +3,7 @@ body {
   margin: 10px 0;
 }
   h1, ol {
-  padding-left: 13px !important;
+  padding-left: 6px !important;
 }
  li, h1 {
     padding-right: 6px;
@@ -12,7 +12,10 @@ body {
     margin-top: 10px;
     border-top: 1px solid;
     padding-top: 5px !important;
-
+    padding-left: 0 !important;
+  }
+  .folder, .file {
+    padding-left: 13px !important;
   }
   html h1 {
     font-family: sans-serif;
@@ -21,24 +24,40 @@ a {  word-wrap: anywhere;  }
 h1 a,
 .folder a {color: #000}
 .file a {
-  font-size: 14px;
-  line-height: 18px;
+  font-size: 13px;
+  line-height: 16px;
   margin-top: 10px;
   display: block;
   margin-bottom: 17px !important;
     text-decoration: none;
 }
 .folder {
-  font-size: 13px;
+  font-size: 16px;
   font-family: sans-serif;
-  font-weight: bold;
+  font-weight: normal;
   line-height: 1.2em;
     margin-bottom: 12px;
     margin-top: 12px;
-
+}
+.a_folder {
+  padding-left: 4px;
+  display: block;
+}
+.folder:before {
+  content: "./ ";
+  margin-left: -9px;
+  position:absolute;
 }
 .folder a {
-   text-decoration: navajowhite;
+   text-decoration: none;
+}
+.file.f3 a {
+  font-style: italic;
+  width: fit-content;
+  display: inline-block;
+  background: #ffe9ed !important;
+  margin-left: -6px;
+  padding-left: 5px;
 }
    #return {
   margin-bottom: -13px;
@@ -84,6 +103,11 @@ h1:empty + ol {
   position: absolute;
   margin-left: -12px;
 }
+
+h1 a span {
+  display: none !important;
+}
+
   ol a:visited {
     color: #107102;
   }
@@ -95,10 +119,16 @@ h1:empty + ol {
     }
       
     .a_folder.active { 
-      color: #5c00ff !important;
+      color: #4300ba !important;
     }
     .a_folder(:focus,:active)  {
       color: blue !important;
+    }
+
+    .folder + .file {
+      margin-top: 20px !important;
+      border-top: 1px solid;
+      padding-top: 7px;
     }
 #filename {
   position: fixed;
@@ -106,6 +136,7 @@ h1:empty + ol {
   background: #FFF;
   padding: 6px;
   width: 100%;
+  border-top: 1px solid;
 }
 #filename a {
   font-size: 10px;

@@ -1,0 +1,28 @@
+[02:38:13] Using gulpfile /var/www/@Dockers/@PDF_js_mozilla/moz/gulpfile.mjs
+[02:38:13] Starting 'server'...
+[02:38:13] Starting 'watchLocale'...
+[02:38:13] Starting 'watchDevSandbox'...
+[02:38:13] Starting 'createServer'...
+
+### Starting local server
+Server running at http://localhost:8888/
+[02:38:14] Finished 'createServer' after 36 ms
+[02:38:14] Starting 'dev-sandbox'...
+[02:38:14] Starting 'scriptingDevSandbox'...
+[02:38:14] Starting 'locale'...
+
+### Building localization files
+[02:38:14] asset pdf.scripting.mjs 105 KiB [emitted] [javascript module] (name: main)
+  
+webpack 5.94.0 compiled successfully
+[02:38:14] Finished 'scriptingDevSandbox' after 625 ms
+[02:38:14] Starting 'createDevSandbox'...
+
+### Building development sandbox
+[BABEL] Note: The code generator has deoptimised the styling of /var/www/@Dockers/@PDF_js_mozilla/moz/external/quickjs/quickjs-eval.js as it exceeds the max of 500KB.
+[02:38:14] asset pdf.sandbox.mjs 711 KiB [emitted] [javascript module] [big] (name: main)
+  
+webpack 5.94.0 compiled successfully
+[02:38:14] Finished 'createDevSandbox' after 108 ms
+[02:38:14] Finished 'dev-sandbox' after 734 ms
+[02:38:14] Finished 'locale' after 664 ms

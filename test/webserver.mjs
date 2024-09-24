@@ -55,6 +55,8 @@ class WebServer {
       GET: [crossOriginHandler],
       POST: [],
     };
+    this.countOtherFiles = 0; // Déclaration de la variable count
+    this.countNormalFiles = 0; // Compteur pour les fichiers normaux
   }
 
   start(callback) {
@@ -192,23 +194,24 @@ class WebServer {
   }
 
   
-
+  //! ---- FRAMEs
   async #serveDirectoryIndex(response, url, localUrl) {
     response.setHeader("Content-Type", "text/html");
     response.writeHead(200);
-    
+     
     // IF NO SRC ... get last_viewed document
     if (url.searchParams.has("frame")) {
       response.end(
         `<html>
         <script>
+        //! ---- GLOBAL JS
+        //! ---- LOAD LAST SAVED ----
         document.addEventListener("DOMContentLoaded", function() {
            const lastFile = localStorage.getItem("localstorage_lastfile");
            const pdfFrame = document.querySelector('frame[name="pdf"]');
            if (pdfFrame && !pdfFrame.src && lastFile) {
                pdfFrame.src = lastFile; // Charger l'URL sauvegardée
            }
-          // alert(lastFile)
         });
         </script>
           <frameset cols=*,200>
@@ -233,8 +236,10 @@ class WebServer {
       `<html>
          <head>
            <meta charset="utf-8">
+            <!-- CSS -->
             <link rel="stylesheet" href="/test/liste_viewer.css">
          </head>
+
           <script>
             // Sauvegarde de l'URL actuelle de la page
              var currentURL = window.location.href;
@@ -256,118 +261,122 @@ class WebServer {
                   localStorage.setItem("pastURL", currentURL); // Mettre à jour l'URL précédente 
              }
 
-
-             
               
-              document.addEventListener("DOMContentLoaded", function() {
-                                  
-                  var currentname = localStorage.getItem("localstorage_lastfile");
-                  if (currentname) {
-                      var decodedURL = decodeURIComponent(currentname);
-                      // alert(decodedURL)
-
-                      var fileName = decodedURL.substring(decodedURL.lastIndexOf('/') + 1);
-                      var currentname_parent = decodedURL.substring(0, decodedURL.lastIndexOf('/')).replace("/web/viewer.html?file=",""); // Chemin vers le fichier
-                      var patent_currentfile="<div><span>< </span><a id='backlink' data-url='"+currentname+"' href='"+currentname_parent+"' target='liste'>"+fileName+"</a></div>"
-                      document.getElementById('filename').innerHTML = patent_currentfile; // Remplacer le contenu
-                  }
-
-                  document.querySelectorAll('.a_file').forEach(fileLink => {
-                      fileLink.addEventListener('click', function(event) {
+            document.addEventListener("DOMContentLoaded", function() {
                           
-                          if (this.href != undefined) {
-                            event.preventDefault();
+              ///// AUtorun
 
-                            localStorage.setItem("localstorage_lastfile", this.href); // Sauvegarder l'URL du fichier
+                var currentname = localStorage.getItem("localstorage_lastfile");
+                if (currentname) {
+                    var decodedURL = decodeURIComponent(currentname);
+                    // alert(decodedURL)
 
-                            var currentname = this.href;
-                            var decodedURL = decodeURIComponent(this.href);
-                            var fileName = decodedURL.substring(decodedURL.lastIndexOf('/') + 1);
-                            
-                            var currentname_parent = decodedURL.substring(0, decodedURL.lastIndexOf('/')).replace("/web/viewer.html?file=",""); // Chemin vers le fichier
-                            var patent_currentfile="<div><span>< </span><a id='backlink' data-url='"+currentname+"' href='"+currentname_parent+"' target='liste'>"+fileName+"</a></div>"
-                            document.getElementById('filename').innerHTML = patent_currentfile; // Remplacer le contenu
-
-                            const pdfFrame = window.parent.frames['pdf']; // Accès par nom
-                            pdfFrame.location.href = currentname;
-
-                          }
-
-                          let thisis= this;
-                          this.classList.add("active");
-                          document.querySelectorAll('.a_file').forEach(relinks => {
-                            if (relinks !== thisis) {
-                              relinks.classList.remove("active");
-                            }
-                          });
-
-
-                      });
-
-                      
-
-                      if (fileLink.href === currentname) {
-                          fileLink.classList.add("active");
-                      }
-
-                  });
-
-
-
-                  var currentname_fldr = localStorage.getItem("localstorage_last_folder");
-                  if (currentname_fldr) { 
-                      var decodedURL_fldr = decodeURIComponent(currentname_fldr);
-                      // alert(decodedURL_fldr); // Affichez la valeur décodée
-                  } else {
-                    // alert("Aucune valeur trouvée pour 'localstorage_last_folder'"); // Message alternatif
-                    const currentname = window.parent.frames['pdf'].location.host; // Accès par nom
-                    // console.log(currentname)
-                    if (!currentname || !currentname.host=="" || currentname.length < 10) {
-                      console.warn("empty_pdf") 
-                      // window.parent.classList.add("empty"); // Ajout de la classe ici
-
-                    } else {
-                      var decodedURL = decodeURIComponent(currentname);
-                      var currentname_parent = decodedURL.substring(0, decodedURL.lastIndexOf('/')).replace("/web/viewer.html?file=",""); // Chemin vers le fichier
-                      localStorage.setItem("localstorage_last_folder", currentname_parent); // Sauvegarder l'URL du fichier
-                      alert("currentname_parent = "+currentname_parent) 
+                    var fileName = decodedURL.substring(decodedURL.lastIndexOf('/') + 1);
+                    var currentname_parent = decodedURL.substring(0, decodedURL.lastIndexOf('/')).replace("/web/viewer.html?file=",""); // Chemin vers le fichier
+                    var patent_currentfile="<div><span>< </span><a id='backlink' data-url='"+currentname+"' href='"+currentname_parent+"?all' target='liste'>"+fileName+"</a></div>"
+                    if ( document.getElementById('filename') ) {
+                      document.getElementById('filename').innerHTML = patent_currentfile; // Remplacer le contenu
                     }
-                    
-                  }
+                }
 
-                  document.querySelectorAll('.a_folder').forEach(folderLink => {
-                    folderLink.addEventListener('click', function(event) {
+                /////// ////// ////////  FILES
+
+                document.querySelectorAll('.a_file').forEach(fileLink => {
+                    fileLink.addEventListener('click', function(event) {
                         
-                        // alert("clic "+this.href)
                         if (this.href != undefined) {
-                          localStorage.setItem("localstorage_last_folder", this.href); // Sauvegarder l'URL du fichier
+                          event.preventDefault();
+
+                          localStorage.setItem("localstorage_lastfile", this.href); // Sauvegarder l'URL du fichier
+
+                          var currentname = this.href;
+                          var decodedURL = decodeURIComponent(this.href);
+                          var fileName = decodedURL.substring(decodedURL.lastIndexOf('/') + 1);
+                          
+                          var currentname_parent = decodedURL.substring(0, decodedURL.lastIndexOf('/')).replace("/web/viewer.html?file=",""); // Chemin vers le fichier
+                          var patent_currentfile="<div><span>< </span><a id='backlink' data-url='"+currentname+"' href='"+currentname_parent+"?all' target='liste'>"+fileName+"</a></div>"
+                          document.getElementById('filename').innerHTML = patent_currentfile; // Remplacer le contenu
+
+                          const pdfFrame = window.parent.frames['pdf']; // Accès par nom
+                          pdfFrame.location.href = currentname;
+
                         }
+
                         let thisis= this;
                         this.classList.add("active");
-                        document.querySelectorAll('.a_folder').forEach(refolders => {
-                          if (refolders !== thisis) {
-                            refolders.classList.remove("active");
+                        document.querySelectorAll('.a_file').forEach(relinks => {
+                          if (relinks !== thisis) {
+                            relinks.classList.remove("active");
                           }
                         });
 
+
                     });
+                   
 
-                    if (folderLink.href === currentname_fldr) {
-                        folderLink.classList.add("active");
-                    } 
-                    // alert(currentname_fldr)
+                    if (fileLink.href === currentname) {
+                        fileLink.classList.add("active");
+                    }
 
-                });
+                }); // a_file
 
+                ///// /////// ///////// FOLDERS
 
+                var currentname_fldr = localStorage.getItem("localstorage_last_folder");
+                if (currentname_fldr) { 
+                    var decodedURL_fldr = decodeURIComponent(currentname_fldr);
+                  
+                } else {
+                  
+                  const currentname = window.parent.frames['pdf'].location.host; // Accès par nom
+                  
+                  // If NO HOST (pdf frame (empty))
+                  if (!currentname || !currentname.host=="" || currentname.length < 10) { 
+                    console.warn("empty_pdf") 
+                    // window.parent.classList.add("empty"); // Ajout de la classe ici
 
-                // document.querySelectorAll('#backlink').forEach(backlink => {
-                //   backlink.addEventListener('click', function(event) {
-                //     event.preventDefault();
-                //     alert("clic")
-                //   });
-                // });
-              });
+                  } else {
+                    var decodedURL = decodeURIComponent(currentname);
+                    var currentname_parent = decodedURL.substring(0, decodedURL.lastIndexOf('/')).replace("/web/viewer.html?file=",""); // Chemin vers le fichier
+                    localStorage.setItem("localstorage_last_folder", currentname_parent); // Sauvegarder l'URL du fichier
+                    alert("currentname_parent = "+currentname_parent) 
+                  } // If NO HOST (pdf frame (empty))
+
+                } // if currentname_fldr
+
+                document.querySelectorAll('.a_folder').forEach(folderLink => {
+                  folderLink.addEventListener('click', function(event) {
+                      
+                      // alert("clic "+this.href)
+                      if (this.href != undefined) {
+                        localStorage.setItem("localstorage_last_folder", this.href); // Sauvegarder l'URL du fichier
+                      }
+                      let thisis= this;
+                      this.classList.add("active");
+                      document.querySelectorAll('.a_folder').forEach(refolders => {
+                        if (refolders !== thisis) {
+                          refolders.classList.remove("active");
+                        }
+                      });
+
+                  });
+
+                  if (folderLink.href === currentname_fldr) {
+                      folderLink.classList.add("active");
+                  } 
+                  // alert(currentname_fldr)
+
+              }); // a_folder
+
+              // LEGACY
+              // document.querySelectorAll('#backlink').forEach(backlink => {
+              //   backlink.addEventListener('click', function(event) {
+              //     event.preventDefault();
+              //     alert("clic")
+              //   });
+              // });
+
+            }); // document.addEventListener("DOMContentLoaded", function() { (( Document ready... ))
            </script>
          <body>` // Début de la liste ordonnée
     );
@@ -375,7 +384,8 @@ class WebServer {
     const segments = url.pathname.split('/').filter(Boolean); // Séparer les segments
     let currentPath = ""; // Chemin courant pour les liens
 
-    const all = url.searchParams.has("all");
+    const alll = url.searchParams.has("all");
+    const pdfs = url.searchParams.has("pdfs") || !url.searchParams.has("pdfs");
     const escapeHTML = untrusted =>
       // Escape untrusted input so that it can safely be used in a HTML response
       // in HTML and in HTML attributes.
@@ -386,10 +396,10 @@ class WebServer {
         .replaceAll('"', "&quot;")
         .replaceAll("'", "&#39;");
 
-
+    // -- FOLDERS PATH
     response.write('<h1 style="font-size:14px;">');
         segments.forEach((segment, index) => {
-          currentPath += `/${segment}`; // Construire le chemin courant
+          currentPath += `/${segment}`; 
           // if (index < segments.length - 1) {
           if (  ( escapeHTML(segment) == "test" ) || ( escapeHTML(segment) == "pdfs") ) {
 
@@ -403,22 +413,35 @@ class WebServer {
           }
         });
     response.write('</h1>'); // Fermer la balise h1
-
-    response.write('<ol style="padding: 0;list-style: none;">'); // Début de la liste ordonnée
-
     // if (url.pathname !== "/") {
     //   response.write('<a id="return" href=".."><-</a><br>');
     // }
 
-
-    // Trier les fichiers par date de modification (ordre décroissant)
+    // -- FILE LISTING
+    response.write('<ol style="padding: 0;list-style: none;">'); 
+    // Trier les fichiers par type (dossiers d'abord, puis fichiers)
     const fileStats = files.map(file => ({
       file,
       stat: fs.statSync(new URL(file, localUrl)),
-    })).sort((a, b) => b.stat.mtime - a.stat.mtime); // Inverser l'ordre ici
+    })).sort((a, b) => {
+      if (a.stat.isDirectory() && !b.stat.isDirectory()) return -1; // Dossier avant fichier
+      if (!a.stat.isDirectory() && b.stat.isDirectory()) return 1;  // Fichier après dossier
+      return b.stat.mtime - a.stat.mtime; // Trier par date de modification
+    });
 
-    // console.log(JSON.stringify(fileStats, null, 2)); // Afficher les statistiques des fichiers en format JSON
+    // console.log(JSON.stringify(fileStats, null, 2)); 
 
+    // TRUNCATE Long files names (du milieux)
+    function truncateMiddle(text, maxLength) {
+      if (text.length <= maxLength) return text;
+      const halfLength = Math.floor(maxLength / 2);
+      return `${text.slice(0, halfLength)}...${text.slice(-halfLength)}`;
+    }
+
+    let countNormalFiles = 0;
+    let countOtherFiles = 0; // Non-pdf files
+
+    const valides_extensions = [".html", ".css", ".text"]; // Déclaration de l'array des extensions valides
 
 
     for (const { file } of fileStats) {
@@ -427,36 +450,92 @@ class WebServer {
       let href = "";
       let label = "";
       let extraAttributes = "";
-
+    
       try {
         stat = fs.statSync(new URL(file, localUrl));
+        // console.log("oktry == " + file)
       } catch (ex) {
         href = encodeURI(item);
         label = `${file} (${ex})`;
         extraAttributes = ' style="color:red"';
+        console.log("error catch files == " + file +"("+ex+")")
+      }
+      
+      const file_extension = path.extname(file).toLowerCase(); // Obtenir l'extension du fichier
+      // Compter les fichiers normaux avant la vérification de l'état
+      if (file_extension === ".pdf") {
+        countNormalFiles++; 
+        console.log("f1 == "+ escapeHTML(file))
+      } else if (valides_extensions.includes(file_extension)) { // Vérifie si l'extension est .pdf ou dans valides_extensions
+        countOtherFiles++;
+        console.log("f3 == "+ escapeHTML(file))
+      } else if (stat.isDirectory()) {
+        console.log("directory == \n"+ escapeHTML(file))
+      } else {
+        console.log("fx == "+ escapeHTML(file))
+      }
+      // console.log("countOtherFiles == "+countOtherFiles)
+      // console.log("countNormalFiles == "+countNormalFiles)
+
+    }
+    
+
+    for (const { file } of fileStats) {
+      let stat;
+      const item = url.pathname + file;
+      let href = "";
+      let label = "";
+      let extraAttributes = "";
+
+
+    
+      try {
+        stat = fs.statSync(new URL(file, localUrl));
+        // console.log("oktry == " + file)
+      } catch (ex) {
+        href = encodeURI(item);
+        label = `${file} (${ex})`;
+        extraAttributes = ' style="color:red"';
+        console.log("error catch files == " + file +"("+ex+")")
       }
 
+
       if (stat) {
+
+
         if (stat.isDirectory()) {
           href = encodeURI(item);
           label = file;
+          // console.log("folder")
           response.write(
-            `<li class='folder'><a class='a_folder' href="${escapeHTML(href)}">${escapeHTML(label)}</a></li>` // Changement ici
+            `<li class='folder f1'><a class='a_folder' href="${escapeHTML(href)}">${escapeHTML(truncateMiddle(label, 40))}</a></li>` 
           ); // Écrire le lien du dossier immédiatement
+
         } else if (path.extname(file).toLowerCase() === ".pdf") {
           href = `/web/viewer.html?file=${encodeURIComponent(item)}`;
           label = file;
           extraAttributes = ' target="pdf"';
 
-          if (label) {
+          if (label && !stat.isDirectory()) {
             response.write(
-              `<li class='file'><a class='a_file' href="${escapeHTML(href)}"${extraAttributes}>${escapeHTML(label)}</a></li>` // Changement ici
+              `<li class='file f2'><a class='a_file' href="${escapeHTML(href)}"${extraAttributes}>${escapeHTML(truncateMiddle(label, 40))}</a></li>`
             );
+            // this.countNormalFiles++; // Incrémenter le compteur pour les fichiers normaux
           }
 
-        } else if (all) {
+        } else if ( (countNormalFiles == 0) || alll ) { // NON PDFs + const all = url.searchParams.has("all");
           href = encodeURI(item);
+          // console.log("DEBUG f3-- = " +item)
+          // console.log(this.countNormalFiles)
+          // console.log(pdfs)
+
           label = file;
+          response.write(
+            `<li class='file f3'><a class='a_file' href="${escapeHTML(href)}"${extraAttributes}>${escapeHTML(truncateMiddle(label, 40))}</a></li>` 
+          )
+          
+        // } else {
+          // this.count++; // Incrémenter la variable de classe
         }
       }
 
@@ -467,9 +546,32 @@ class WebServer {
       response.write("<p>No files found</p>");
     }
 
-    if (!all && !url.searchParams.has("side")) {
+    if ((countOtherFiles == 0)) {
       response.write(
-        '<hr><div id="footer"><p>( Triés par date )</p><p>( <a href="?all">voir les non-pdf</a> )</p></div>'
+        '<hr><div id="footer"><p>il n\'y a que des .pdf</p><p>( Triés par date )</p></div>'
+
+      );
+    }
+    else if ((countNormalFiles == 0)) {
+      response.write(
+        '<hr><div id="footer"><p>! pas de .pdf</p><p>( Triés par date )</p></div>'
+
+      );
+    }
+    else if ((countOtherFiles > 0) && !alll && (countNormalFiles != 0)) {
+      response.write(
+        '<hr><div id="footer"><p><a href="?all">voir les non-pdf</a> ( '+countOtherFiles+' )</p><p>( Triés par date )</p></div>'
+      );
+    } else if (!alll && !url.searchParams.has("side") && (countNormalFiles > 0)) {
+      // if (countNormalFiles > 0) {
+        console.log("pas de PDFs");
+        response.write(
+          '<hr><div id="footer" class="no_pdfs"><p><a href="?pdfs">voir les pdf seulement</a> ( '+countNormalFiles+' )</p><p>( Triés par date )</p></div>'
+        );
+      // }
+    } else if (alll && !url.searchParams.has("side") && (countNormalFiles > 0)) {
+      response.write(
+        '<hr><div id="footer"><p>( filtrer : <a href="?pdfs">pdf seulement</a> )</p><p>( Triés par date )</p></div>'
       );
     }
 
@@ -506,6 +608,7 @@ class WebServer {
     stream.on("error", error => {
       response.writeHead(500);
       response.end();
+      console.warn("errror");
     });
 
     response.setHeader("Accept-Ranges", "bytes");
@@ -521,7 +624,8 @@ class WebServer {
 
   #getContentType(fileURL) {
     const extension = path.extname(fileURL.pathname).toLowerCase();
-    return MIME_TYPES[extension] || DEFAULT_MIME_TYPE;
+    // console.warn(extension);
+    return MIME_TYPES[extension] || DEFAULT_MIME_TYPE; 
   }
 }
 
