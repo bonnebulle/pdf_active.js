@@ -508,7 +508,7 @@ class WebServer {
           label = file;
           // console.log("folder")
           response.write(
-            `<li class='folder f1'><a class='a_folder' href="${escapeHTML(href)}">${escapeHTML(truncateMiddle(label, 40))}</a></li>` 
+            `<li class='folder f1'><a class='a_folder' title="${escapeHTML(label)}" href="${escapeHTML(href)}">${escapeHTML(truncateMiddle(label, 40))}</a></li>` 
           ); // Écrire le lien du dossier immédiatement
 
         } else if (path.extname(file).toLowerCase() === ".pdf") {
@@ -518,7 +518,7 @@ class WebServer {
 
           if (label && !stat.isDirectory()) {
             response.write(
-              `<li class='file f2'><a class='a_file' href="${escapeHTML(href)}"${extraAttributes}>${escapeHTML(truncateMiddle(label, 40))}</a></li>`
+              `<li class='file f2'><a class='a_file' title="${escapeHTML(label)}" href="${escapeHTML(href)}"${extraAttributes}>${escapeHTML(truncateMiddle(label, 40))}</a></li>`
             );
             // this.countNormalFiles++; // Incrémenter le compteur pour les fichiers normaux
           }
@@ -531,7 +531,7 @@ class WebServer {
 
           label = file;
           response.write(
-            `<li class='file f3'><a class='a_file' href="${escapeHTML(href)}"${extraAttributes}>${escapeHTML(truncateMiddle(label, 40))}</a></li>` 
+            `<li class='file f3'><a class='a_file' title="${escapeHTML(label)}" href="${escapeHTML(href)}"${extraAttributes}>${escapeHTML(truncateMiddle(label, 40))}</a></li>` 
           )
           
         // } else {
