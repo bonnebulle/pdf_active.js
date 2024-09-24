@@ -267,6 +267,49 @@ class WebServer {
               ///// AUtorun
 
                 var currentname = localStorage.getItem("localstorage_lastfile");
+
+
+                // Vérifier si le paramètre "file" existe dans l'URL
+                const paramFile = new URLSearchParams(window.parent.location.search).get("file");
+                if (paramFile) {
+                  let cur_url = window.parent.location.host;
+                  let clean_cur_url = cur_url.replace(/[\?&].*$/, "");
+                  let last_fix_url ="http://"+clean_cur_url + paramFile;
+                  
+                  // alert(last_fix_url);
+                  // window.parent.history.removeState({}, '', window.parent.location.origin + "?frame");
+                  // window.parent.href("http://localhost:8888/test/pdfs/?frame");
+                  // window.parent.history.href = "http://localhost:8888/test/pdfs/?frame";
+                  
+
+
+                  const pdfFrame = window.parent.frames['pdf']; // Accès par nom
+                  if (pdfFrame.location.href != last_fix_url){
+                    pdfFrame.location.href = last_fix_url; // Charger l'URL du paramètre "file"
+                    // let last_fix_url_encoded = encodeURIComponent(last_fix_url); 
+                    localStorage.setItem("localstorage_lastfile", last_fix_url); // Sauvegarder l'URL du fichier
+                  }
+
+
+                  var decodedURL = decodeURIComponent(last_fix_url);
+                  var fileName = decodedURL.substring(decodedURL.lastIndexOf('/') + 1);
+                  var currentname_parent = decodedURL.substring(0, decodedURL.lastIndexOf('/')).replace("/web/viewer.html?file=",""); // Chemin vers le fichier
+
+                  const listeFrame = window.parent.frames['liste']; 
+                  if (listeFrame.location.href != currentname_parent){
+                    listeFrame.location.href = currentname_parent;
+                    localStorage.setItem("localstorage_last_folder", currentname_parent); // Sauvegarder l'URL du fichier
+                  }
+
+                  window.parent.history.pushState({}, '', "http://localhost:8888/test/pdfs/?frame"); 
+
+                  // alert(currentname_parent)
+
+
+
+
+
+                } else 
                 if (currentname) {
                     var decodedURL = decodeURIComponent(currentname);
                     // alert(decodedURL)
@@ -283,10 +326,13 @@ class WebServer {
 
                 document.querySelectorAll('.a_file').forEach(fileLink => {
                     fileLink.addEventListener('click', function(event) {
-                        
+
+                      // setTimeout(() => {
+
                         if (this.href != undefined) {
                           event.preventDefault();
-
+                          // alert("dd")
+                          
                           localStorage.setItem("localstorage_lastfile", this.href); // Sauvegarder l'URL du fichier
 
                           var currentname = this.href;
@@ -300,21 +346,30 @@ class WebServer {
                           const pdfFrame = window.parent.frames['pdf']; // Accès par nom
                           pdfFrame.location.href = currentname;
 
-                        }
+                          let clean_currentname = currentname.replace("http://localhost:8888","?frame&file=");
+                          window.parent.history.pushState({}, '', clean_currentname); 
 
-                        let thisis= this;
-                        this.classList.add("active");
-                        document.querySelectorAll('.a_file').forEach(relinks => {
-                          if (relinks !== thisis) {
-                            relinks.classList.remove("active");
-                          }
-                        });
+                          // alert(final_url)
+
+
+                        }
+                      // }, 500); // Délai de 500 ms
+
+                      let thisis= this;
+                      this.classList.add("active");
+                      document.querySelectorAll('.a_file').forEach(relinks => {
+                        if (relinks !== thisis) {
+                          relinks.classList.remove("active");
+                        }
+                      });
 
 
                     });
                    
+                    // alert(decodeURIComponent(fileLink.href) + " --- " +currentname);
+                    // alert(currentname)
 
-                    if (fileLink.href === currentname) {
+                    if (decodeURIComponent(fileLink.href) === currentname) {
                         fileLink.classList.add("active");
                     }
 
