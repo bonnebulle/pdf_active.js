@@ -262,14 +262,15 @@ class WebServer {
               document.addEventListener("DOMContentLoaded", function() {
                                   
                   var currentname = localStorage.getItem("localstorage_lastfile");
-                  var decodedURL = decodeURIComponent(currentname);
-                  // alert(decodedURL)
+                  if (currentname) {
+                      var decodedURL = decodeURIComponent(currentname);
+                      // alert(decodedURL)
 
-                  var fileName = decodedURL.substring(decodedURL.lastIndexOf('/') + 1);
-                  var currentname_parent = decodedURL.substring(0, decodedURL.lastIndexOf('/')).replace("/web/viewer.html?file=",""); // Chemin vers le fichier
-                  var patent_currentfile="<div><span>< </span><a id='backlink' data-url='"+currentname+"' href='"+currentname_parent+"' target='liste'>"+fileName+"</a></div>"
-                  document.getElementById('filename').innerHTML = patent_currentfile; // Remplacer le contenu
-
+                      var fileName = decodedURL.substring(decodedURL.lastIndexOf('/') + 1);
+                      var currentname_parent = decodedURL.substring(0, decodedURL.lastIndexOf('/')).replace("/web/viewer.html?file=",""); // Chemin vers le fichier
+                      var patent_currentfile="<div><span>< </span><a id='backlink' data-url='"+currentname+"' href='"+currentname_parent+"' target='liste'>"+fileName+"</a></div>"
+                      document.getElementById('filename').innerHTML = patent_currentfile; // Remplacer le contenu
+                  }
 
                   document.querySelectorAll('.a_file').forEach(fileLink => {
                       fileLink.addEventListener('click', function(event) {
@@ -314,11 +315,24 @@ class WebServer {
 
 
                   var currentname_fldr = localStorage.getItem("localstorage_last_folder");
-                  if (currentname_fldr) { // Vérifiez si la valeur existe
+                  if (currentname_fldr) { 
                       var decodedURL_fldr = decodeURIComponent(currentname_fldr);
                       // alert(decodedURL_fldr); // Affichez la valeur décodée
                   } else {
-                      // alert("Aucune valeur trouvée pour 'localstorage_last_folder'"); // Message alternatif
+                    // alert("Aucune valeur trouvée pour 'localstorage_last_folder'"); // Message alternatif
+                    const currentname = window.parent.frames['pdf'].location.host; // Accès par nom
+                    // console.log(currentname)
+                    if (!currentname || !currentname.host=="" || currentname.length < 10) {
+                      console.warn("empty_pdf") 
+                      // window.parent.classList.add("empty"); // Ajout de la classe ici
+
+                    } else {
+                      var decodedURL = decodeURIComponent(currentname);
+                      var currentname_parent = decodedURL.substring(0, decodedURL.lastIndexOf('/')).replace("/web/viewer.html?file=",""); // Chemin vers le fichier
+                      localStorage.setItem("localstorage_last_folder", currentname_parent); // Sauvegarder l'URL du fichier
+                      alert("currentname_parent = "+currentname_parent) 
+                    }
+                    
                   }
 
                   document.querySelectorAll('.a_folder').forEach(folderLink => {
