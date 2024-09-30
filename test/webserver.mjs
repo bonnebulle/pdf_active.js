@@ -217,24 +217,26 @@ class WebServer {
            
           if (lastFolder) {
             // Vérifier si le fichier existe
-            fetch(lastFolder)
-              .then(response => {
-                  if (response.ok) {
-                      listeFrame.src = lastFolder; // Charger l'URL sauvegardée
-                      // alert("ok")
-                  } else {
-                      console.error("Le fichier n'existe pas :", lastFile);
-                      // alert("notexists") 
-                      // RESET DEFAULT
-                      localStorage.setItem("localstorage_last_folder", "http://localhost:8888/test/pdfs/"); // FIX
-                      listeFrame.src = "http://localhost:8888/test/pdfs/"; // Charger l'URL sauvegardée
-                  }
-              })
-              .catch(error => {
-                  console.error("Erreur lors de la vérification du fichier :", error);
-                  // alert("fail")
-              });
-          }
+          fetch(lastFolder)
+            .then(response => {
+                if (response.ok) {
+                    listeFrame.src = lastFolder; // Charger l'URL sauvegardée
+                    // alert("ok")
+                } else {
+                    console.error("Le fichier n'existe pas :", lastFile);
+                    // alert("notexists") 
+                    // RESET DEFAULT
+                    localStorage.setItem("localstorage_last_folder", "http://localhost:8888/test/pdfs/"); // FIX
+                    localStorage.setItem("localstorage_last_folder_error", "oui"); // save error
+                    listeFrame.src = "http://localhost:8888/test/pdfs/"; // Charger l'URL sauvegardée
+                    listeFrame.classList.add("folder_not_exists"); // Ajouter la classe si le dossier n'existe pas
+                }
+            })
+            .catch(error => {
+                console.error("Erreur lors de la vérification du fichier :", error);
+                // alert("fail")
+            });
+        }
 
         });
         </script>
@@ -287,7 +289,21 @@ class WebServer {
 
               
             document.addEventListener("DOMContentLoaded", function() {
-                          
+                       
+            
+
+
+                const localstorage_last_folder = localStorage.getItem("localstorage_last_folder");
+                const localstorage_last_folder_error = localStorage.getItem("localstorage_last_folder_error");
+                const listeFrame = document.querySelector('frame[name="liste"]');
+                if (localstorage_last_folder_error == "oui") {
+                    const errorDiv = document.createElement('div');
+                    errorDiv.id = 'error';
+                    errorDiv.textContent = 'ERROR, dossier supprimé/déplacé';
+                    document.querySelector('h1').appendChild(errorDiv);
+                    localStorage.setItem("localstorage_last_folder_error", "non"); // Sauvegarder l'URL du fichier
+                }
+                  
               ///// AUtorun
 
                 var currentname = localStorage.getItem("localstorage_lastfile");
@@ -512,6 +528,9 @@ class WebServer {
         .replaceAll('"', "&quot;")
         .replaceAll("'", "&#39;");
 
+
+
+
     // -- FOLDERS PATH
     response.write('<h1 style="font-size:14px;">');
         segments.forEach((segment, index) => {
@@ -668,7 +687,6 @@ class WebServer {
     if ((countOtherFiles == 0) && (countNormalFiles > 0)) {
       response.write(
         '<hr><div id="footer"><p>il n\'y a que des .pdf</p><p>( Triés par date )</p></div>'
-
       );
     }
     else if ((countNormalFiles == 0)) {
