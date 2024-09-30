@@ -212,6 +212,30 @@ class WebServer {
            if (pdfFrame && !pdfFrame.src && lastFile) {
                pdfFrame.src = lastFile; // Charger l'URL sauvegardée
            }
+           const lastFolder = localStorage.getItem("localstorage_last_folder");
+           const listeFrame = document.querySelector('frame[name="liste"]');
+           
+          if (lastFolder) {
+            // Vérifier si le fichier existe
+            fetch(lastFolder)
+              .then(response => {
+                  if (response.ok) {
+                      listeFrame.src = lastFolder; // Charger l'URL sauvegardée
+                      // alert("ok")
+                  } else {
+                      console.error("Le fichier n'existe pas :", lastFile);
+                      // alert("notexists") 
+                      // RESET DEFAULT
+                      localStorage.setItem("localstorage_last_folder", "http://localhost:8888/test/pdfs/"); // FIX
+                      listeFrame.src = "http://localhost:8888/test/pdfs/"; // Charger l'URL sauvegardée
+                  }
+              })
+              .catch(error => {
+                  console.error("Erreur lors de la vérification du fichier :", error);
+                  // alert("fail")
+              });
+          }
+
         });
         </script>
           <frameset cols=*,200>
@@ -295,15 +319,34 @@ class WebServer {
                   var fileName = decodedURL.substring(decodedURL.lastIndexOf('/') + 1);
                   var currentname_parent = decodedURL.substring(0, decodedURL.lastIndexOf('/')).replace("/web/viewer.html?file=",""); // Chemin vers le fichier
 
-                  const listeFrame = window.parent.frames['liste']; 
-                  if (listeFrame.location.href != currentname_parent){
-                    listeFrame.location.href = currentname_parent;
-                    localStorage.setItem("localstorage_last_folder", currentname_parent); // Sauvegarder l'URL du fichier
+
+                  const lastFile = currentname_parent;
+                  if (lastFile) {
+                      // Vérifier si le fichier existe
+                      fetch(lastFile)
+                          .then(response => {
+                              if (response.ok) {
+                                  
+                                const listeFrame = window.parent.frames['liste']; 
+                                if (listeFrame.location.href != currentname_parent){
+                                  listeFrame.location.href = currentname_parent;
+                                  localStorage.setItem("localstorage_last_folder", currentname_parent); // Sauvegarder l'URL du fichier
+                                }
+
+                              } else {
+                                  console.error("Le fichier n'existe pas :", lastFile);
+                              }
+                          })
+                          .catch(error => {
+                              console.error("Erreur lors de la vérification du fichier :", error);
+                          });
                   }
+
 
                   window.parent.history.pushState({}, '', "http://localhost:8888/test/pdfs/?frame"); 
 
                   // alert(currentname_parent)
+                    // alert("currentname_parent = "+currentname_parent)
 
 
 
@@ -320,6 +363,7 @@ class WebServer {
                     if ( document.getElementById('filename') ) {
                       document.getElementById('filename').innerHTML = patent_currentfile; // Remplacer le contenu
                     }
+
                 }
 
                 /////// ////// ////////  FILES
@@ -378,8 +422,25 @@ class WebServer {
                 ///// /////// ///////// FOLDERS
 
                 var currentname_fldr = localStorage.getItem("localstorage_last_folder");
+                // alert("currentname_fldr == "+currentname_fldr)
                 if (currentname_fldr) { 
-                    var decodedURL_fldr = decodeURIComponent(currentname_fldr);
+                    var decodedURL_fldr_test = decodeURIComponent(currentname_fldr);
+                        const lastFile = decodedURL_fldr_test;
+                        if (decodedURL_fldr_test) {
+                            // Vérifier si le fichier existe
+                            fetch(lastFile)
+                                .then(response => {
+                                    if (response.ok) {
+                                        var decodedURL_fldr = decodedURL_fldr_test;
+                                    } else {
+                                        var decodedURL_fldr = "https://localhost:8888/test/pdfs/"
+                                        alert("fail")
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error("Erreur lors de la vérification du fichier :", error);
+                                });
+                        }
                   
                 } else {
                   
@@ -394,7 +455,7 @@ class WebServer {
                     var decodedURL = decodeURIComponent(currentname);
                     var currentname_parent = decodedURL.substring(0, decodedURL.lastIndexOf('/')).replace("/web/viewer.html?file=",""); // Chemin vers le fichier
                     localStorage.setItem("localstorage_last_folder", currentname_parent); // Sauvegarder l'URL du fichier
-                    alert("currentname_parent = "+currentname_parent) 
+                    // alert("currentname_parent = "+currentname_parent) 
                   } // If NO HOST (pdf frame (empty))
 
                 } // if currentname_fldr
@@ -497,6 +558,7 @@ class WebServer {
     let countOtherFiles = 0; // Non-pdf files
 
     const valides_extensions = [".html", ".css", ".text"]; // Déclaration de l'array des extensions valides
+    const excludedFiles = [".gitignore", ".gitattributes", ".nginxy"]; // Fichiers à exclure
 
 
     for (const { file } of fileStats) {
@@ -521,7 +583,7 @@ class WebServer {
       if (file_extension === ".pdf") {
         countNormalFiles++; 
         console.log("f1 == "+ escapeHTML(file))
-      } else if (valides_extensions.includes(file_extension)) { // Vérifie si l'extension est .pdf ou dans valides_extensions
+      } else if (valides_extensions.includes(file_extension) && !excludedFiles.includes(file)) { // Vérifie si l'extension est .pdf ou dans valides_extensions et n'est pas dans excludedFiles
         countOtherFiles++;
         console.log("f3 == "+ escapeHTML(file))
       } else if (stat.isDirectory()) {
@@ -554,7 +616,7 @@ class WebServer {
         console.log("error catch files == " + file +"("+ex+")")
       }
 
-
+      
       if (stat) {
 
 
@@ -579,15 +641,17 @@ class WebServer {
           }
 
         } else if ( (countNormalFiles == 0) || alll ) { // NON PDFs + const all = url.searchParams.has("all");
-          href = encodeURI(item);
-          // console.log("DEBUG f3-- = " +item)
-          // console.log(this.countNormalFiles)
-          // console.log(pdfs)
+          if (!excludedFiles.includes(file)) {
+            href = encodeURI(item);
+            // console.log("DEBUG f3-- = " +item)
+            // console.log(this.countNormalFiles)
+            // console.log(pdfs)
 
-          label = file;
-          response.write(
-            `<li class='file f3'><a class='a_file' title="${escapeHTML(label)}" href="${escapeHTML(href)}"${extraAttributes}>${escapeHTML(truncateMiddle(label, 40))}</a></li>` 
-          )
+            label = file;
+            response.write(
+              `<li class='file f3'><a class='a_file' title="${escapeHTML(label)}" href="${escapeHTML(href)}"${extraAttributes}>${escapeHTML(truncateMiddle(label, 40))}</a></li>` 
+            )
+          }
           
         // } else {
           // this.count++; // Incrémenter la variable de classe
@@ -601,7 +665,7 @@ class WebServer {
       response.write("<p>No files found</p>");
     }
 
-    if ((countOtherFiles == 0)) {
+    if ((countOtherFiles == 0) && (countNormalFiles > 0)) {
       response.write(
         '<hr><div id="footer"><p>il n\'y a que des .pdf</p><p>( Triés par date )</p></div>'
 
